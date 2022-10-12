@@ -6,6 +6,10 @@ export function serverError(res, error) {
   console.log(error);
   return res.sendStatus(500);
 }
+export function unauthorizedResponse(res, error) {
+  console.log(error);
+  return res.sendStatus(401);
+}
 
 export function conflictResponse(res, error) {
   console.log(error);

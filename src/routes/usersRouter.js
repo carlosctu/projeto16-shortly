@@ -6,7 +6,7 @@ const usersRouter = express.Router();
 
 usersRouter.post(
   "/signup",
-  userMiddleware.userMiddleware,
+  userMiddleware.signinMiddleware,
   userController.insert
 );
 

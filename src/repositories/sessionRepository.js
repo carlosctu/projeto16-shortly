@@ -19,3 +19,4 @@ export async function getSessionData(token) {
 
   return sessionData;
 }
+

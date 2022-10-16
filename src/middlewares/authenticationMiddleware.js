@@ -1,6 +1,9 @@
-import * as responses from "../helpers/responseHelpers.js";
-import * as userReposistory from "../repositories/usersRepository.js";
-import { signUpValidation, signInValidation } from "../schemas/userSchema.js";
+import * as response from "../helpers/responseHelpers.js";
+import * as authenticationReposistory from "../repositories/authenticationRepository.js";
+import {
+  signUpValidation,
+  signInValidation,
+} from "../schemas/authenticationSchema.js";
 import bcrypt from "bcrypt";
 
 export async function signUpMiddleware(req, res, next) {
@@ -10,21 +13,21 @@ export async function signUpMiddleware(req, res, next) {
 
   if (validation.error) {
     const errors = validation.error.details.map((error) => error.message);
-    return responses.unprocessableResponse(res, errors);
+    return response.unprocessableResponse(res, errors);
   }
 
   if (password !== confirmPassword)
-    return responses.unprocessableResponse(res, "senhas não coincidem!");
+    return response.unprocessableResponse(res, "senhas não coincidem!");
 
   try {
-    const userExists = await userReposistory.getUserData(email);
+    const userExists = await authenticationReposistory.getUserData(email);
 
     if (userExists.rowCount !== 0)
-      return responses.conflictResponse(res, "usuário já cadastrado!");
+      return response.conflictResponse(res, "usuário já cadastrado!");
 
     next();
   } catch (error) {
-    return responses.serverError(res, error);
+    return response.serverError(res, error);
   }
 }
 
@@ -35,19 +38,23 @@ export async function signInMiddleware(req, res, next) {
 
   if (validation.error) {
     const errors = validation.error.details.map((error) => error.message);
-    return responses.unprocessableResponse(res, errors);
+    return response.unprocessableResponse(res, errors);
   }
 
   try {
-    const userExists = await userReposistory.getUserData(email);
+    const userExists = await authenticationReposistory.getUserData(email);
     if (
       userExists.rowCount === 0 ||
       !bcrypt.compareSync(password, userExists.rows[0].password)
     )
-      return responses.unauthorizedResponse(res, "usuário e/ou senha inválida!");
+      return response.unauthorizedResponse(
+        res,
+        "usuário e/ou senha inválida!"
+      );
 
     next();
   } catch (error) {
-    return responses.serverError(res, error);
+    return response.serverError(res, error);
   }
 }
+

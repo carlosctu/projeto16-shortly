@@ -1,19 +1,19 @@
 import express from "express";
-import * as userController from "../controllers/usersController.js";
-import * as userMiddleware from "../middlewares/usersMiddleware.js";
+import * as authenticationController from "../controllers/authenticationController.js";
+import * as authenticationMiddleware from "../middlewares/authenticationMiddleware.js";
 
-const usersRouter = express.Router();
+const authenticationRouter = express.Router();
 
-usersRouter.post(
+authenticationRouter.post(
   "/signup",
-  userMiddleware.signUpMiddleware,
-  userController.insert
+  authenticationMiddleware.signUpMiddleware,
+  authenticationController.insert
 );
 
-usersRouter.post(
+authenticationRouter.post(
   "/signin",
-  userMiddleware.signInMiddleware,
-  userController.login
+  authenticationMiddleware.signInMiddleware,
+  authenticationController.login
 );
 
-export default usersRouter;
+export default authenticationRouter;

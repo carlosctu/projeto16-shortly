@@ -7,8 +7,7 @@ export function serverError(res, error) {
   return res.sendStatus(500);
 }
 export function unauthorizedResponse(res, error) {
-  console.log(error);
-  return res.sendStatus(401);
+  return res.status(401).send(error);
 }
 
 export function conflictResponse(res, error) {
@@ -20,6 +19,7 @@ export function okResponse(res, body) {
   return res.status(200).send(body);
 }
 
-export function createdResponse(res, body) {
-  return res.status(201).send(body);
+export function createdResponse(res) {
+  return res.sendStatus(201);
 }
+

@@ -1,59 +1,53 @@
-import {
-  conflictResponse,
-  serverError,
-  unprocessableResponse,
-} from "../controllers/helpers/controllerHelpers.js";
-import connection from "../db/database.js";
-import { signupValidation, signinValidation } from "../schemas/userSchema.js";
+import * as responses from "../helpers/responseHelpers.js";
+import * as userReposistory from "../repositories/usersRepository.js";
+import { signUpValidation, signInValidation } from "../schemas/userSchema.js";
 import bcrypt from "bcrypt";
-import { v4 as uuidv4 } from "uuid";
 
-export async function signinMiddleware(req, res, next) {
+export async function signUpMiddleware(req, res, next) {
   const { name, email, password, confirmPassword } = req.body;
 
-  const validation = signupValidation.validate(req.body, { abortEarly: false });
+  const validation = signUpValidation.validate(req.body, { abortEarly: false });
 
   if (validation.error) {
     const errors = validation.error.details.map((error) => error.message);
-    return unprocessableResponse(res, errors);
+    return responses.unprocessableResponse(res, errors);
   }
 
   if (password !== confirmPassword)
-    return unprocessableResponse(res, "senhas não coincidem!");
+    return responses.unprocessableResponse(res, "senhas não coincidem!");
 
   try {
-    const userExists = await connection.query(
-      "SELECT * FROM users WHERE email = $1",
-      [email]
-    );
+    const userExists = await userReposistory.getUserData(email);
 
     if (userExists.rowCount !== 0)
-      return conflictResponse(res, "usuário já cadastrado!");
+      return responses.conflictResponse(res, "usuário já cadastrado!");
 
     next();
   } catch (error) {
-    return serverError(res, error);
+    return responses.serverError(res, error);
   }
 }
 
-export async function signupMiddleware(req, res, next) {
+export async function signInMiddleware(req, res, next) {
   const { email, password } = req.body;
 
-  try {
-    const userExists = await connection.query(
-      "SELECT password FROM users WHERE email = $1",
-      [email]
-    );
+  const validation = signInValidation.validate(req.body, { abortEarly: false });
 
+  if (validation.error) {
+    const errors = validation.error.details.map((error) => error.message);
+    return responses.unprocessableResponse(res, errors);
+  }
+
+  try {
+    const userExists = await userReposistory.getUserData(email);
     if (
       userExists.rowCount === 0 ||
-      !bcrypt.compareSync(password, userExists.rows[0])
-    ) {
-      return unauthorizedResponse(res, "usuário e/ou senha inválida!");
-    }
+      !bcrypt.compareSync(password, userExists.rows[0].password)
+    )
+      return responses.unauthorizedResponse(res, "usuário e/ou senha inválida!");
+
     next();
-    // vai no outroconst token = uuidv4();
   } catch (error) {
-    return serverError(res, error);
+    return responses.serverError(res, error);
   }
 }

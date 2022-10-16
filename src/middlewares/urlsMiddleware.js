@@ -1,13 +1,29 @@
 import * as response from "../helpers/responseHelpers.js";
 import { urlValidation } from "../schemas/urlSchema.js";
 import * as sessionRepository from "../repositories/sessionRepository.js";
+import validator from "validator";
 
-export async function shortenUrlMiddlware(req, res, next) {
-  const validation = urlValidation.validate(req.body, { abortEarly: false });
+export async function authenticationMiddleware(req, res, next) {
   let token = req.headers.authorization;
 
   if (!token || !token.includes("Bearer"))
     return response.unauthorizedResponse(res, "Token inválida!");
+
+  token = token.replace("Bearer ", "");
+
+  if (!validator.isUUID(token))
+    return response.unauthorizedResponse(
+      res,
+      "Token precisa estar no formato UUID"
+    );
+
+  res.locals.token = token;
+  next();
+}
+
+export async function shortenUrlMiddleware(req, res, next) {
+  const validation = urlValidation.validate(req.body, { abortEarly: false });
+  const token = res.locals.token;
 
   if (validation.error) {
     const errors = validation.error.details.map((error) => error.message);
@@ -15,9 +31,7 @@ export async function shortenUrlMiddlware(req, res, next) {
   }
 
   try {
-    token = token.replace("Bearer ", "");
-    const session = await sessionRepository.getSessionToken(token);
-
+    const session = await sessionRepository.getSessionData(token);
     if (!session)
       return response.unauthorizedResponse(res, "Sessão não existe!");
 

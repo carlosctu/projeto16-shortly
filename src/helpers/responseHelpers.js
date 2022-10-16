@@ -15,6 +15,10 @@ export function conflictResponse(res, error) {
   res.sendStatus(409);
 }
 
+export function notFoundResponse(res) {
+  res.sendStatus(404);
+}
+
 export function okResponse(res, body) {
   return res.status(200).send(body);
 }
@@ -23,6 +27,10 @@ export function createdResponse(res) {
   return res.sendStatus(201);
 }
 
-export function createdResponseWithBody(res, body){
-  return res.status(201).send(body)
+export function deletedResponse(res) {
+  return res.sendStatus(204);
+}
+
+export function createdResponseWithBody(res, body) {
+  return res.status(201).send(body);
 }

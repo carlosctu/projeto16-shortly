@@ -12,7 +12,7 @@ export async function insertToken(userId) {
   return token;
 }
 
-export async function getSessionToken(token) {
+export async function getSessionData(token) {
   const sessionData = await (
     await connection.query(`SELECT * FROM ${TABLE} WHERE token = $1;`, [token])
   ).rows[0];

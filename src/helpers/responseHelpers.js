@@ -23,3 +23,6 @@ export function createdResponse(res) {
   return res.sendStatus(201);
 }
 
+export function createdResponseWithBody(res, body){
+  return res.status(201).send(body)
+}

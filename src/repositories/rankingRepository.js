@@ -6,7 +6,7 @@ export async function getRanking() {
     SUM(ur."visitCount")::INTEGER AS "visitCount" FROM users u
     LEFT JOIN urls ur ON u.id = ur."userId"
     GROUP BY u.id
-    ORDER BY "visitCount" ASC
+    ORDER BY "visitCount" DESC
     LIMIT 10;
     `,
     []

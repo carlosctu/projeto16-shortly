@@ -1,12 +1,15 @@
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
 import router from "./routes/index.js";
+
+dotenv.config();
 
 const server = express();
 server.use(express.json());
 server.use(cors());
 server.use(router);
 
-server.listen(4000, () => {
-  console.log("Magic happens on port 4000");
+server.listen(process.env.PORT, () => {
+  console.log("Magic happens on port " + process.env.PORT);
 });
